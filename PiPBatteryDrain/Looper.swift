@@ -1,6 +1,6 @@
 //
 //  Looper.swift
-//  pip-custom
+//  PiPBatteryDrain
 //
 //  Created by Naruki Chigira on 2022/08/13.
 //
@@ -11,7 +11,6 @@ protocol LooperDelegate: AnyObject {
     func loop(_ looper: Looper)
 }
 
-/// ループ処理の制御
 final class Looper {
     private var timer: Timer? {
         didSet {
@@ -41,7 +40,6 @@ final class Looper {
         self.frequencyPerSecond = frequencyPerSecond
     }
 
-    /// 開始
     func run() {
         guard !isRunning else {
             print("Looper is already running.")
@@ -50,7 +48,6 @@ final class Looper {
         isRunning = true
     }
 
-    /// 停止
     func stop() {
         isRunning = false
     }
