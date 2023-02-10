@@ -33,15 +33,23 @@ class ViewController: UIViewController {
     }
 
     private let cpuUsage = CPUUsage()
+    private lazy var cpuLabelUpdateTimer: Timer = {
+        let timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            self?.updateCPUUsageLabel()
+        }
+        timer.tolerance = 0.01
+        return timer
+    }()
+
     private let sampleBufferDisplayLayer = AVSampleBufferDisplayLayer()
+    private let sampleBufferFactory = SampleBufferFactory()
 
     private lazy var looper: Looper = {
         let looper = Looper(frequencyPerSecond: frequencyPerSecond)
         looper.delegate = self
         return looper
     }()
-    private lazy var sampleBufferFactory = SampleBufferFactory()
-    
+
     private lazy var pictureInPictureController: AVPictureInPictureController = {
         let contentSource = AVPictureInPictureController.ContentSource(sampleBufferDisplayLayer: sampleBufferDisplayLayer, playbackDelegate: self)
         let controller = AVPictureInPictureController(contentSource: contentSource)
@@ -59,6 +67,8 @@ class ViewController: UIViewController {
         sampleBufferDisplayLayer.backgroundColor = UIColor.black.cgColor
         layerContainerView.layer.addSublayer(sampleBufferDisplayLayer)
         pictureInPictureController.delegate = self
+
+        _ = cpuLabelUpdateTimer
     }
     
     override func viewDidLayoutSubviews() {
@@ -97,6 +107,15 @@ class ViewController: UIViewController {
     }
 
     @objc
+    private func updateCPUUsageLabel() {
+        if let currentUsage = cpuUsage.getCurrentUsage() {
+            cpuUsageLabel.text = String(format: "%4.1f%%", currentUsage)
+        } else {
+            cpuUsageLabel.text = "***"
+        }
+    }
+
+    @objc
     private func didChangeEnergyDrainValue(_ sender: UISwitch) {
         isEnergyDrained = sender.isOn
         pictureInPictureController.invalidatePlaybackState()
@@ -114,11 +133,6 @@ class ViewController: UIViewController {
 extension ViewController: LooperDelegate {
     func loop(_ looper: Looper) {
         render()
-        if let currentUsage = cpuUsage.getCurrentUsage() {
-            cpuUsageLabel.text = String(format: "%4.1f%%", currentUsage)
-        } else {
-            cpuUsageLabel.text = "***"
-        }
     }
 }
 
