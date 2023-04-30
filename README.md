@@ -1,3 +1,5 @@
+**This problem fixed above iOS16.4 by Apple :)**
+
 # PiP Battery Drain
 
 Sample project to reproduce PiP batery drain.
