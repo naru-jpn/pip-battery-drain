@@ -1,4 +1,4 @@
-**This problem fixed above iOS16.4 by Apple :)**
+**This problem fixed above iOS16.4 :)**
 
 # PiP Battery Drain
 
